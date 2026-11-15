@@ -20,7 +20,7 @@ function errorResult(error) {
 
 export function createMcpServer() {
   const server = new McpServer(
-    { name: 'dsh-writing-suite', version: '1.0.1' },
+    { name: 'dsh-writing-suite', version: '1.1.0' },
     { instructions: '先读仓库 AGENTS.md 和对应写作 skill。教材结论以源 Markdown 为准，论文数字以证据文件为准；自动检查不能代替人工验收。构建只在用户要求生成产物时执行，教材构建必须显式传 confirm: true。' }
   );
 

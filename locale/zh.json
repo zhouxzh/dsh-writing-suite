@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "写作套件",
-    "description": "统一提供教材与论文审计、LaTeX 与站点构建、skill 安装，以及 TikZ 神经网络框图路径几何检查。",
+    "description": "统一提供教材与论文审计、专利技术交底、LaTeX 与站点构建、skill 安装，以及 TikZ 神经网络框图路径几何检查。",
     "detail": "docs/DETAIL.md"
   }
 }

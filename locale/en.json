@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Writing suite",
-    "description": "Tutorial and paper auditing, LaTeX and site builds, skill installation, and geometry-based TikZ diagram checks in one DSH bundle.",
+    "description": "Tutorial, paper and patent-disclosure workflows, LaTeX and site builds, skill installation, and geometry-based TikZ diagram checks in one DSH bundle.",
     "detail": "docs/DETAIL.md"
   }
 }

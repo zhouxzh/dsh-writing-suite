@@ -2,7 +2,7 @@
 
 [![test](https://github.com/zhouxzh/dsh-writing-suite/actions/workflows/test.yml/badge.svg)](https://github.com/zhouxzh/dsh-writing-suite/actions/workflows/test.yml)
 
-统一的 DSH 写作套件：**一个 bundle、一个写作侧栏、三个领域模块、18 个工具、19 个 skill**。
+统一的 DSH 写作套件：**一个 bundle、一个写作侧栏、四个领域模块、18 个工具、21 个 skill**。
 
 它合并了原先的 `dsh-paper-suite` 和 `dsh-plugin-ascend310b-writing`，并吸收神经网络框图路径审计。既有工具名保持不变，已有调用无需改名。
 
@@ -13,6 +13,7 @@
 | 教材写作 `lib/book` | `ascend310b_writing_*` | Markdown 教材审计、冻结标题、链接、锚点、site/deck/PDF 产物、代码文档、写作进度、构建和推送门禁 |
 | 学术论文 `lib/paper` | `paper_*` | 论文骨架、引用/证据审计、`latexmk` 构建、证据同步、完整性审阅、cover letter 和审稿回复 |
 | 框图审计 `lib/diagram` | `ascend310b_writing_neural_diagram_audit` | 用显式 `.layout.json` 几何契约检查 TikZ 连线是否穿框或相交 |
+| 专利写作 `skills/patent-disclosure` | 无独立 Host 工具 | 九段式发明专利技术交底、附图与表格、算法/数据模型公开、审查与代理交接；不生成权利要求或正式申请文件 |
 
 ### 兼容工具名
 
@@ -26,6 +27,12 @@
 - 新增 `ascend310b_writing_neural_diagram_audit`
 
 这些名字暂时不变，避免已有会话、文档和自动化调用失效。后续若发布统一命名，应先提供兼容别名。
+
+## 专利技术交底
+
+`patent-disclosure` 是纯 skill 能力，不注册 Host 工具。它面向专业专利代理师，输出“填写前须知＋九段式技术交底＋附录”，不生成权利要求书、正式申请说明书、摘要或请求书，也不判断授权概率。
+
+`diagram-design` 为该流程和一般技术报告提供结构图、流程图、状态图和连接图规范。这两个 skill 从原 `dsh-patent-writing` 合并，模板和参考文件完整保留。
 
 ## 统一面板
 
@@ -137,7 +144,7 @@ npm test
 - 论文脚手架、引用、证据、日志解析和审阅；
 - 18 个 Host 工具注册与两条只读报告路由；
 - 统一客户端的单面板注册；
-- 19 个 skill 与 `nature-shared` 支持目录的安装一致性；
+- 21 个 skill 与 `nature-shared` 支持目录的安装一致性；
 - TikZ 路径碰撞检测和外围绕行通道；
 - `npm pack --dry-run` 的发布文件清单。
 
@@ -152,7 +159,7 @@ dsh-writing-suite/
 │   ├── drivers/          # shell/toolchain adapters used by book builds
 │   ├── paper/            # academic paper tools
 │   └── diagram/          # TikZ path audit
-├── skills/               # tutorial, paper, writing and diagram skills
+├── skills/               # tutorial, paper, patent, writing and diagram skills
 ├── mcp/                  # optional MCP surface
 ├── scripts/              # skill installer and repository checks
 ├── test/
