@@ -1,6 +1,6 @@
 {
   "name": "dsh-writing-suite",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Unified writing suite for DeepSeek Harness: tutorial/book auditing, academic papers, patent technical disclosures, LaTeX/site workflows, and TikZ neural-diagram path audits.",
   "author": "Xianzhong Zhou <zhouxzh@gdut.edu.cn>",
@@ -48,8 +48,8 @@
   },
   "scripts": {
     "pretest": "node scripts/link-stub.mjs",
-    "test:book": "node test/book/build.mjs && node test/book/checks.mjs && node test/book/code.mjs && node test/book/courseware.mjs && node test/book/deck-web.mjs && node test/book/deck.mjs && node test/book/docs.mjs && node test/book/dot-templates.mjs && node test/book/figures.mjs && node test/book/language.mjs && node test/book/latex-map.mjs && node test/book/layout.mjs && node test/book/manuscript-rules.mjs && node test/book/record-audit.mjs && node test/book/site-assets.mjs && node test/book/site.mjs && node test/book/smoke.mjs && node test/book/style.mjs && node test/book/toolchain.mjs",
-    "test": "node --check lib/client.js && npm run test:book && node test/smoke.mjs && node test/scholarship.mjs && node test/host.mjs && node test/client.mjs && node test/skills.mjs && node test/diagram.mjs && node test/patent.mjs && node test/mcp.mjs",
+    "test:book": "node test/book/build.mjs && node test/book/case4.mjs && node test/book/checks.mjs && node test/book/code.mjs && node test/book/courseware.mjs && node test/book/deck-web.mjs && node test/book/deck.mjs && node test/book/docs.mjs && node test/book/dot-templates.mjs && node test/book/figures.mjs && node test/book/language.mjs && node test/book/latex-map.mjs && node test/book/layout.mjs && node test/book/manuscript-rules.mjs && node test/book/record-audit.mjs && node test/book/security.mjs && node test/book/site-assets.mjs && node test/book/site.mjs && node test/book/smoke.mjs && node test/book/style.mjs && node test/book/toolchain.mjs",
+    "test": "node --check lib/client.js && npm run test:book && node test/smoke.mjs && node test/scholarship.mjs && node test/paper-evidence.mjs && node test/host.mjs && node test/client.mjs && node test/skills.mjs && node test/diagram.mjs && node test/patent.mjs && node test/letters.mjs && node test/response-gates.mjs && node test/mcp.mjs",
     "posttest": "node scripts/remove-stub.mjs",
     "skills:install": "node scripts/install-skill.mjs",
     "skills:check": "node scripts/install-skill.mjs --check",

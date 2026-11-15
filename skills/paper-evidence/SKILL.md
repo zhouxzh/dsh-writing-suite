@@ -10,6 +10,8 @@ metadata:
 
 # Paper Evidence
 
+本 skill 是本地论文工作区的证据主门。完成证据冻结后，英文稿的起草或完整审阅交给 `scientific-writing`，纯语言润色交给 `nature-polishing`；后两者不得绕过本证据门新增数字或结论。
+
 论文里每一个数字都必须能回答三个问题：**来自哪个证据文件、属于哪个协议、适用范围到哪里为止。** 回答不了，就不要写进正文。
 
 ## 何时使用
@@ -38,7 +40,7 @@ metadata:
 2. 为每条 claim 找证据文件；找不到就先补证据，不要先写正文。
 3. 在 `audit/claim_evidence_map.md` 登记 locator；本地路径用 `evidence/...`，远程路径写 `host:path`。
 4. 写正文，数字与 claim 一一对应。
-5. 跑 `paper_audit` 确认 locator 都存在、`.bib` 与正文引用双向一致。
+5. 草稿阶段运行 `paper_audit mode=draft`；投稿前必须运行 `paper_audit mode=submission`，此时缺失 register、`pending`、`invalidated` 和无法离线核验的远程 locator 都阻断。
 6. 人工打开证据文件核对数字本身——工具只证明“文件在”，不证明“数字对”。
 
 ## 输出格式
@@ -51,7 +53,7 @@ metadata:
 
 ## 与工具的分工
 
-- `paper_audit` 检查：claim map 里的文件是否存在、正文引用与 `.bib` 是否对得上、PDF 是否过期。
+- `paper_audit mode=draft|submission` 检查：claim map 文件、远程 locator 状态、pending/invalidated、正文引用与 `.bib` 是否闭合、PDF 是否过期；提交模式把未闭合证据设为 error。
 - 本 skill 负责：这个数字**该不该**写、写在哪个范围里、状态该标什么。
 - 工具不能替代人工核验；它只能把“文件不见了”这类错误提前抓出来。
 

@@ -28,6 +28,8 @@ assert.match(skill, /九段/);
 assert.match(skill, /不生成权利要求或正式申请文件/);
 assert.ok(skill.includes('references/research-and-prior-art.md'));
 assert.ok(skill.includes('references/data-model-disclosure.md'));
+assert.ok(skill.includes('`diagram-design`'));
+assert.ok(skill.includes('office-render'));
 assert.match(diagram, /^---\nname: diagram-design\n/m);
 assert.match(diagram, /箭头不穿节点/);
 

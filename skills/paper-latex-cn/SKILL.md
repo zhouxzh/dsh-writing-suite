@@ -2,7 +2,7 @@
 name: paper-latex-cn
 description: 中文论文 LaTeX 工作区的结构与排版约定（scrartcl + ctex + biblatex APA + XeLaTeX）。当新建论文工作区、调整 main.tex 前言、增删章节、修 overfull box、处理缺字形或未定义引用、或需要 make pdf 构建与排错时使用。
 license: MIT
-compatibility: 需要 XeLaTeX + latexmk + biber；离线可用。
+compatibility: 需要 XeLaTeX + latexmk + biber；这是中文内部工作区格式。英文期刊排版依赖外部 latex-paper-en 或期刊官方模板。
 metadata:
   version: "1.0"
   skill-author: local
@@ -10,7 +10,7 @@ metadata:
 
 # Paper LaTeX (Chinese)
 
-一套中文论文工作区的固定约定。目标是：新论文开工时不用重新决定排版，编译问题时按固定顺序排查。
+一套中文论文**内部工作区**的固定约定，不是投稿模板。目标是：新论文开工时不用重新决定排版，编译问题时按固定顺序排查。目标期刊提供官方模板时，官方模板优先；英文 IEEE/期刊排版使用 `latex-paper-en` 或对应期刊 skill，本 skill 不替代它们。
 
 ## 何时使用
 
@@ -61,7 +61,7 @@ metadata:
 
 - 表题在上，图题在下；caption 写清对象、范围和单位。
 - 数字位数与正文一致；同一列不要混用不同精度。
-- 图必须有源数据与生成脚本的记录；不要只交 PNG。
+- 每张图维护 `figure ID → 源文件 → 生成脚本 → 导出文件 → caption/alt text`；不要只交 PNG。
 - 不要用 `\resizebox` 硬压表格来消除 overfull —— 先改列宽或拆表。
 
 ## 编译与排错顺序
@@ -78,7 +78,7 @@ metadata:
 
 - `paper_scaffold` 生成上面这套骨架；已存在的文件不会被覆盖。
 - `paper_build` 跑 latexmk 并返回结构化诊断（引擎、页数、错误、缺字形、overfull）。
-- `paper_audit` 顺带检查 PDF 是否过期。
+- `paper_audit mode=draft|submission` 检查 PDF 新鲜度、引用、证据和 claim 状态；投稿前使用 `submission` 模式。
 
 ## 禁止
 

@@ -20,7 +20,7 @@ function errorResult(error) {
 
 export function createMcpServer() {
   const server = new McpServer(
-    { name: 'dsh-writing-suite', version: '1.1.0' },
+    { name: 'dsh-writing-suite', version: '1.2.0' },
     { instructions: '先读仓库 AGENTS.md 和对应写作 skill。教材结论以源 Markdown 为准，论文数字以证据文件为准；自动检查不能代替人工验收。构建只在用户要求生成产物时执行，教材构建必须显式传 confirm: true。' }
   );
 
@@ -70,14 +70,17 @@ export function createMcpServer() {
   register('ascend310b_writing_build_status', '查看构建任务',
     '按 jobId 查看构建状态和最近日志；cancel: true 可停止正在运行的构建。',
     { jobId: z.string().uuid(), cancel: z.boolean().optional() }, true);
+  register('ascend310b_writing_neural_diagram_audit', '审计神经网络框图',
+    '检查 TikZ 连线与模块/文字框冲突、路径交叉和 layout source hash 漂移。',
+    { source: z.string().min(1), layout: z.string().optional(), margin: z.number().optional(), suggest: z.boolean().optional(), requireHash: z.boolean().optional() });
 
   const workspace = z.string().min(1).describe('论文工作区的绝对路径。');
   register('paper_scaffold', '生成论文骨架',
     '创建中文 LaTeX 论文工作区；已有文件不会被覆盖。',
     { root: z.string().min(1), slug: z.string().min(1), title: z.string().min(1), author: z.string().optional(), dryRun: z.boolean().optional() }, true);
   register('paper_audit', '审计论文',
-    '离线检查引用、参考文献、claim map、占位符和 PDF 新鲜度。',
-    { workspace, maxFindings });
+    '离线检查引用、参考文献、claim map、远程证据、pending claim、占位符和 PDF 新鲜度。',
+    { workspace, mode: z.enum(['draft', 'submission']).optional(), maxFindings });
   register('paper_build', '构建论文',
     '用 latexmk 构建论文并返回错误、未定义引用、缺字形和页数。',
     { workspace, entry: z.string().optional(), engine: z.enum(['auto', 'xelatex', 'pdflatex', 'lualatex']).optional(), timeoutMs: z.number().int().positive().optional() }, true);

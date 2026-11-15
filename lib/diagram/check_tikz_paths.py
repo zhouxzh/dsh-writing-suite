@@ -9,6 +9,7 @@ segments touching a box boundary are reported as collisions.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import re
@@ -16,10 +17,16 @@ from pathlib import Path
 
 
 def parse_source(path: Path) -> dict:
-    text = path.read_text(encoding="utf-8")
+    raw = path.read_bytes()
+    text = raw.decode("utf-8")
     nodes = re.findall(r"\\node[^\n]*\(([^)]+)\)", text)
     draws = re.findall(r"\\draw(?:\[[^]]*\])?\s+([^;]+);", text)
-    return {"source": str(path), "node_names": nodes, "draw_count": len(draws)}
+    return {
+        "source": str(path),
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "node_names": nodes,
+        "draw_count": len(draws),
+    }
 
 
 def point(value):
@@ -94,11 +101,24 @@ def make_suggestions(boxes, paths):
     ]
 
 
-def audit(source, layout, margin, suggestions):
+def audit(source, layout, margin, suggestions, require_hash=False):
     source_info = parse_source(source)
     boxes = [normalize_box(b) for b in layout.get("boxes", [])]
     paths = layout.get("paths", [])
     findings = []
+    expected_hash = str(layout.get("source_sha256", "")).strip().lower()
+    if not expected_hash:
+        findings.append({
+            "severity": "error" if require_hash else "warning",
+            "path": "source",
+            "message": "layout has no source_sha256; source/layout drift cannot be ruled out"
+        })
+    elif expected_hash != source_info["sha256"]:
+        findings.append({
+            "severity": "error",
+            "path": "source",
+            "message": "source_sha256 does not match the TikZ source; regenerate the layout"
+        })
     for path in paths:
         points = [point(p) for p in path.get("polyline", [])]
         if len(points) < 2:
@@ -142,6 +162,7 @@ def main():
     ap.add_argument("--layout")
     ap.add_argument("--margin", type=float, default=0.04)
     ap.add_argument("--no-suggest", action="store_true")
+    ap.add_argument("--require-hash", action="store_true")
     args = ap.parse_args()
     source = Path(args.source).resolve()
     layout_path = Path(args.layout).resolve() if args.layout else source.with_suffix(".layout.json")
@@ -153,7 +174,7 @@ def main():
         return 1
     try:
         layout = json.loads(layout_path.read_text(encoding="utf-8"))
-        result = audit(source, layout, args.margin, not args.no_suggest)
+        result = audit(source, layout, args.margin, not args.no_suggest, args.require_hash)
     except Exception as exc:
         print(json.dumps({"ok": False, "text": f"layout parse/audit failed: {exc}"}))
         return 1

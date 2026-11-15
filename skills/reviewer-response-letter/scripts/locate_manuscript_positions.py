@@ -25,7 +25,8 @@ Usage:
     python locate_manuscript_positions.py --pdf paper.pdf --snippet "exact text"
 
 Requires: pdftotext (Poppler) with -bbox-layout support.
-Exit code: 0 all stated pages match, 1 mismatch/missing, 2 input error.
+Exit code: 0 all stated pages and passages verified, 1 mismatch/missing,
+2 input error or manual review required.
 """
 from __future__ import annotations
 
@@ -387,13 +388,15 @@ def main() -> int:
 
     unverified = [r for r in rows if r["status"] == "DELETED (location unverified)"]
     if unverified:
-        print(f"\nNOTE: {len(unverified)} deletion(s) have no replacement passage; "
-              "their stated locations need manual verification.")
+        print(f"\nMANUAL_REVIEW_REQUIRED: {len(unverified)} deletion(s) have no replacement passage; "
+              "their stated locations need author verification.")
     if warnings:
-        print(f"\nNOTE: {warnings} passage(s) need manual column/paragraph verification.")
+        print(f"\nMANUAL_REVIEW_REQUIRED: {warnings} passage(s) need manual column/paragraph verification.")
     if mismatches:
         print(f"\nFAIL: {mismatches} passage(s) missing or mislocated.")
         return 1
+    if unverified or warnings:
+        return 2
     print("\nPASS: all located passages match the stated page numbers.")
     return 0
 

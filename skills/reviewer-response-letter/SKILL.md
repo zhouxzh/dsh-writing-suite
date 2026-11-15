@@ -2,7 +2,7 @@
 name: reviewer-response-letter
 description: 审稿人回复意见（response letter / rebuttal letter）的 LaTeX 工作流。用于从作者 DOCX 回复稿迁移出点对点回复信，保持蓝色删除、红色新增的修订标记，按正文编号与排版复现公式，引用论文正式图片并独立编译，逐条核对审稿意见与答复。触发词包括 response letter、审稿意见回复、回复信、rebuttal、reviewer response。
 license: MIT
-compatibility: 需要 XeLaTeX；颜色审计脚本需要 python-docx；图片与公式核对需要可编译的论文源文件。
+compatibility: 需要 XeLaTeX、Poppler（PDF 位置审计）、Python 3；颜色审计脚本需要 python-docx；图片与公式核对需要可编译的论文源文件。
 metadata:
   version: "1.0"
   skill-author: local
@@ -186,6 +186,7 @@ python scripts/verify_revision_text.py `
 - `\ref`/`\eqref`/`\cite` 通过 `--aux` 换成真实编号后比对，剩余 `CLOSE` 通常只是单位空格或标点差异；
 - 表格脚注、公式重排可能落入 `REVIEW`，以人工比对为准；
 - **红字必须是正文原句**。如果一段红字只是“回复里的概述/解释”，应改为黑色；继续标红会被判为 `REVIEW`，因为它在正文中并不逐字存在。
+- 只要仍有 `CLOSE` 或 `REVIEW`，脚本退出码为 `2`，状态是 `MANUAL_REVIEW_REQUIRED`；作者签认并消除未决项后才算通过。
 
 ### 7. 位置定位与位置审查
 
@@ -209,7 +210,7 @@ python scripts/locate_manuscript_positions.py `
 - 页码不符 = `PAGE a->b` 错误；栏/段不符标为 `COLUMN?` / `PARA?`，需人工复核，因为 Poppler 有时把双栏合并成一个 block；
 - 若正文 PDF 带 `lineno` 行号，会附带提取印刷行号。
 
-结果写入 `work/positions.md`，不要提交。页码全部通过后才算位置审查完成。
+结果写入 `work/positions.md`，不要提交。页码全部通过后才算位置审查完成；脚本退出码 `2` 表示仍有删除项或栏/段位置需要作者签认，不是通过。作者必须处理 `MANUAL_REVIEW_REQUIRED` 后才能继续。
 
 ### 8. 网页投稿的两个文本框（手写，不自动导出）
 
@@ -230,7 +231,7 @@ xelatex -interaction=nonstopmode -halt-on-error response-letter.tex
 - 在 `response letter/` 目录内编译成功，不依赖论文根目录图片。
 - 日志无 `^!`、`Undefined`、`Missing character`、图片缺失。
 - 运行 `scripts/check_response_letter.py` 做静态检查；
-- 运行 `scripts/check_hardcoded_refs.py V2/sn-article.tex`，正文不得残留硬编码编号（回复信用 `--letter` 模式，仅作提示）。
+- 运行 `scripts/check_hardcoded_refs.py V2/<manuscript>.tex --strict`，正文不得残留硬编码编号；回复信运行 `scripts/check_hardcoded_refs.py response-letter.tex --letter --strict`，审稿意见原文中的历史编号可保留。
 
 ## 常见故障与修法
 

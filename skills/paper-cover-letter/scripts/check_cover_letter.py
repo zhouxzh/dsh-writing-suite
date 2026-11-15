@@ -4,14 +4,16 @@
 Checks:
   * leftover placeholders (TBD, XX%, [Journal], <...>)
   * required metadata (title, journal, manuscript ID, date, email, signature)
-  * one-page claim consistency against the compiled PDF (optional --pdf)
-  * numbers in the letter that also appear in the manuscript (optional --manuscript)
+  * one-page cover letter against the compiled letter PDF (optional --pdf)
+  * manuscript page-limit claims against the compiled manuscript PDF
+  * quantitative claims in the letter against the manuscript source
   * banned marketing phrases
   * unbalanced braces / duplicate dates
 
 Usage:
     python check_cover_letter.py cover-letter.tex
-    python check_cover_letter.py cover-letter.tex --pdf out/cover-letter.pdf --manuscript ../sn-article.tex
+    python check_cover_letter.py cover-letter.tex --pdf out/cover-letter.pdf \
+        --manuscript ../sn-article.tex --manuscript-pdf ../out/sn-article.pdf
 Exit code: 0 pass, 1 errors, 2 unreadable input.
 """
 from __future__ import annotations
@@ -23,6 +25,11 @@ import sys
 from pathlib import Path
 
 PLACEHOLDER = re.compile(r"(TBD|TODO|XXX|\bXX%|\[Journal\]|\[Manuscript ID\]|<[^>\n]{2,}>)")
+QUANTITY = re.compile(
+    r"\b\d+(?:\.\d+)?\s*(?:\\?%|pages?|times?|Hz|kHz|MHz|GHz|V|mV|kV|A|mA|"
+    r"ms|s|min|hours?|h|GB|MB|KB|dB)",
+    re.I,
+)
 BANNED = [
     "groundbreaking",
     "paradigm",
@@ -50,7 +57,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Static checks for a cover letter.")
     parser.add_argument("tex", type=Path)
     parser.add_argument("--pdf", type=Path, help="compiled cover-letter PDF")
-    parser.add_argument("--manuscript", type=Path, help="manuscript .tex for number cross-check")
+    parser.add_argument("--manuscript", type=Path, help="manuscript .tex for quantitative cross-check")
+    parser.add_argument("--manuscript-pdf", type=Path, help="compiled manuscript PDF for page-limit claims")
     args = parser.parse_args()
 
     if not args.tex.is_file():
@@ -91,26 +99,47 @@ def main() -> int:
 
     if args.pdf:
         if not args.pdf.is_file():
-            errors.append(f"PDF not found: {args.pdf}")
+            errors.append(f"cover-letter PDF not found: {args.pdf}")
         else:
             pages = read_pdf_pages(args.pdf)
             if pages is None:
-                warnings.append("could not read PDF page count via pdfinfo")
+                errors.append("could not read cover-letter PDF page count via pdfinfo")
             else:
-                print(f"PDF pages: {pages}")
+                print(f"cover-letter PDF pages: {pages}")
                 if pages > 1:
                     errors.append(f"cover letter is {pages} pages; trim to one page")
-                if re.search(r"(within|fits|fit)\s+(the\s+)?(ten|10)[- ]page", text, re.I) and pages > 10:
-                    errors.append("letter claims compliance with a 10-page limit, but PDF exceeds 10 pages")
 
-    numbers = set(re.findall(r"\b\d+(?:\.\d+)?\s?\\?%", text))
-    if numbers and args.manuscript and args.manuscript.is_file():
-        manuscript = args.manuscript.read_text(encoding="utf-8", errors="replace")
-        missing = [n for n in sorted(numbers) if n.replace(" ", "") not in manuscript.replace(" ", "")]
-        for item in missing:
-            warnings.append(f"number '{item}' not found verbatim in manuscript")
+    page_limit_claim = re.search(
+        r"(?:within|fits?|under|no more than)\s+(?:the\s+)?(ten|10)[- ]page",
+        text,
+        re.I,
+    )
+    if page_limit_claim:
+        if args.manuscript_pdf is None or not args.manuscript_pdf.is_file():
+            errors.append("letter claims a 10-page manuscript limit but --manuscript-pdf was not provided")
+        else:
+            manuscript_pages = read_pdf_pages(args.manuscript_pdf)
+            if manuscript_pages is None:
+                errors.append("could not read manuscript PDF page count via pdfinfo")
+            else:
+                print(f"manuscript PDF pages: {manuscript_pages}")
+                if manuscript_pages > 10:
+                    errors.append(
+                        f"letter claims compliance with a 10-page limit, but manuscript is {manuscript_pages} pages"
+                    )
 
-    print(f"percentages: {', '.join(sorted(numbers)) if numbers else '(none)'}")
+    quantities = {match.group(0).strip() for match in QUANTITY.finditer(text)}
+    if quantities:
+        if args.manuscript is None or not args.manuscript.is_file():
+            errors.append("letter contains quantitative claims but --manuscript was not provided")
+        else:
+            manuscript = args.manuscript.read_text(encoding="utf-8", errors="replace")
+            normalized_manuscript = re.sub(r"\s+", "", manuscript)
+            for item in sorted(quantities):
+                if re.sub(r"\s+", "", item) not in normalized_manuscript:
+                    errors.append(f"quantity '{item}' not found verbatim in manuscript source")
+
+    print(f"quantities: {', '.join(sorted(quantities)) if quantities else '(none)'}")
     if warnings:
         print("\nWARNINGS")
         for item in warnings:

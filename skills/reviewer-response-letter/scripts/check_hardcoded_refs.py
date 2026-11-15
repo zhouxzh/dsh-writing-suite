@@ -8,7 +8,7 @@ and response letters.
 
 Usage:
     python check_hardcoded_refs.py manuscript.tex
-    python check_hardcoded_refs.py response-letter.tex --strict
+    python check_hardcoded_refs.py response-letter.tex --letter --strict
 
 Findings inside reviewer-comment quotations are marked [quote]; they usually
 reproduce the reviewer's numbering and may be kept. Everything marked [body]

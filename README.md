@@ -120,6 +120,25 @@ Windows 上工具会自动尝试 `DSH_PYTHON`、`PYTHON`、Anaconda/miniconda �
 
 几何检查通过后仍必须在论文最终尺寸下检查 PDF；它不能判断字体可读性、箭头语义或视觉层级。
 
+## 外部依赖与降级
+
+| 能力 | 提供方 | 缺失时 |
+| --- | --- | --- |
+| 案例来源固定、板端复现 | `ascend310b-case-testing` | 经验性结果保持 `untested`，不得声称 board pass |
+| 环境与硬件事实 | `ascend310b-env-check`、Ascend 板端工具 | 只做本地静态检查并明确边界 |
+| Word 生成与渲染 | `office` / `office-docx` / `office-render` | 专利交底退回 Markdown/LaTeX 和可编辑图源 |
+| 英文期刊 LaTeX | `latex-paper-en` 或期刊官方 skill | 本套件只提供中文论文工作区 `paper-latex-cn` |
+| TikZ 几何审计 | Python 3 + 本套件 Host/MCP 工具 | 不能声称箭头/模块框无碰撞 |
+
+## Fail-closed 门
+
+- cover/response 身份字段缺失、大小写不同或无法解析即失败；
+- cover letter 的正文页数和量化结论必须提供对应 manuscript 源文件/PDF；
+- 审稿回复的 `CLOSE`/`REVIEW`、无法定位的删除项返回退出码 2，必须作者签认；
+- `paper_audit mode=submission` 把 pending/invalidated claim、缺失 register 和无法离线核验的远程证据设为 error；
+- 教材推送门包含代码工程文档 error、case4 自包含和高置信度凭证扫描；
+- TikZ 神经网络审计可用 `requireHash=true` 阻断 sidecar 与 TikZ 源漂移。
+
 ## 安全边界
 
 - 写作/论文审计工具只读；生成骨架、证据同步、构建和框图 layout 文件属于写操作。

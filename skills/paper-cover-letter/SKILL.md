@@ -2,7 +2,7 @@
 name: paper-cover-letter
 description: 期刊投稿与返修 cover letter（投稿信/附信）的 LaTeX 工作流。用于初投稿、major/minor revision 返修信，按 KOMA-Script 欧洲学术信函版式生成一页正式英文信，核对标题、稿号、作者、单位、邮箱、图页数与所有量化结论。触发词包括 cover letter、投稿信、附信、submission letter、revision letter。
 license: MIT
-compatibility: 需要 XeLaTeX；默认使用 KOMA-Script scrlttr2 与随附的 european-academic-letter.lco。
+compatibility: 需要 XeLaTeX；PDF 页数检查需要 pdfinfo；量化结论核对需要 manuscript .tex，页数声明核对需要 compiled manuscript PDF。
 metadata:
   version: "1.0"
   skill-author: local
@@ -67,7 +67,7 @@ metadata:
 3. 从 `references/initial-submission.tex` 或 `references/revision.tex` 复制模板。
 4. 填写元数据（期刊、稿号、日期、收件人、发件人）。
 5. 写正文，控制在一页；编译后用 `pdfinfo` 核对页数。
-6. 运行 `scripts/check_cover_letter.py` 静态检查，再人工通读一遍。
+6. 运行 `scripts/check_cover_letter.py cover-letter.tex --pdf out/cover-letter.pdf --manuscript <manuscript>.tex --manuscript-pdf <compiled-manuscript>.pdf`；有量化结论或页数声明时缺少对应正文证据会阻断。再人工通读一遍。
 
 ## 编译
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "dsh-writing-suite",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Unified DSH writing suite for tutorial manuscripts, academic papers, patent technical disclosures, LaTeX builds, evidence, and neural-network diagram audits.",
   "license": "MIT",
   "keywords": [

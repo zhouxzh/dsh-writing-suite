@@ -180,12 +180,12 @@ console.log(`\n${gate.text}`);
 check(typeof gate.ready === 'boolean', 'the gate must report a boolean verdict');
 check(
 	gate.items.map((item) => item.id).join(',') ===
-		'manuscript-audit,commit-tree,uncommitted-manuscripts,render,artifacts,presentation-render,pages-ci',
+		'manuscript-audit,code-docs,secret-scan,commit-tree,uncommitted-manuscripts,render,artifacts,presentation-render,pages-ci',
 	`unexpected gate items: ${gate.items.map((item) => item.id).join(',')}`
 );
 check(
-	gate.items.filter((item) => item.blocking).length === 3,
-	'manuscript audit, commit tree and real deck rendering may block a push'
+	gate.items.filter((item) => item.blocking).length === 5,
+	'manuscript, code docs, secrets, commit tree and real deck rendering may block a push'
 );
 check(gate.human.length === 1 && gate.human[0].includes('预览'), 'the gate must name the preview confirmation it cannot verify');
 

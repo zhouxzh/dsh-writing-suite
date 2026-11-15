@@ -7,7 +7,8 @@ verbatim in the same submission round:
 
 Usage:
     python check_letter_identity.py cover-letter.tex response-letter.tex
-Exit code: 0 identical, 1 differences, 2 unreadable input.
+Exit code: 0 all fields present and identical, 1 missing/different fields,
+2 unreadable input.
 """
 from __future__ import annotations
 
@@ -93,6 +94,7 @@ def main() -> int:
     cover = args.cover_letter.read_text(encoding="utf-8", errors="replace")
     response = args.response_letter.read_text(encoding="utf-8", errors="replace")
 
+    missing = 0
     differences = 0
     print(f"{'field':<14} {'cover letter':<52} response letter")
     print("-" * 120)
@@ -101,17 +103,19 @@ def main() -> int:
         right = extract(response, names)
         if not left or not right:
             status = "MISSING"
-        elif left.casefold() == right.casefold():
+            missing += 1
+        elif left == right:
             status = "OK"
         else:
             status = "DIFF"
             differences += 1
         print(f"{field:<14} {left[:52]:<52} {right[:52]}  [{status}]")
 
-    if differences:
-        print(f"\nFAIL: {differences} identity field(s) differ.")
+    failures = missing + differences
+    if failures:
+        print(f"\nFAIL: {missing} missing and {differences} differing identity field(s).")
         return 1
-    print("\nPASS: identity metadata matches.")
+    print("\nPASS: identity metadata is present and matches verbatim.")
     return 0
 
 

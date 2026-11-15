@@ -14,7 +14,8 @@ Usage:
         --response response-letter.tex \
         --markdown work/text-audit.md
 
-Exit code: 0 all checks pass, 1 mismatch, 2 unreadable input.
+Exit code: 0 all checks pass, 1 mismatch, 2 unreadable input or manual
+author review required for CLOSE/REVIEW passages.
 """
 from __future__ import annotations
 
@@ -215,8 +216,8 @@ def main() -> int:
         print(f"\nFAIL: {failures} passage(s) do not match the manuscript source.")
         return 1
     if reviews:
-        print(f"\nPASS with {reviews} passage(s) requiring manual review (CLOSE/REVIEW).")
-        return 0
+        print(f"\nMANUAL_REVIEW_REQUIRED: {reviews} passage(s) are CLOSE/REVIEW and must be confirmed by the author.")
+        return 2
     print("\nPASS: every red passage is verbatim and every blue passage is absent.")
     return 0
 

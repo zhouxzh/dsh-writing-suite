@@ -1,7 +1,8 @@
 /** Geometry test for the merged TikZ neural-diagram audit. */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -13,7 +14,9 @@ const source = join(root, 'figure.tex');
 const layout = join(root, 'figure.layout.json');
 
 await writeFile(source, '\\begin{tikzpicture}\\node (a) at (1,1) {A};\\end{tikzpicture}\n', 'utf8');
+const sourceHash = createHash('sha256').update(await readFile(source)).digest('hex');
 await writeFile(layout, JSON.stringify({
+	source_sha256: sourceHash,
 	boxes: [
 		{ name: 'a', kind: 'module', rect: [0, 0, 2, 2] },
 		{ name: 'b', kind: 'module', rect: [3, 0, 5, 2] }
@@ -24,8 +27,8 @@ await writeFile(layout, JSON.stringify({
 	]
 }), 'utf8');
 
-function run(command, prefix = []) {
-	return spawnSync(command, [...prefix, script, '--source', source, '--layout', layout], { encoding: 'utf8' });
+function run(command, prefix = [], extra = []) {
+	return spawnSync(command, [...prefix, script, '--source', source, '--layout', layout, ...extra], { encoding: 'utf8' });
 }
 
 try {
@@ -53,6 +56,17 @@ try {
 	assert.equal(report.ok, false, 'collision fixture must fail');
 	assert.ok(report.findings.some((finding) => finding.path === 'collision' && finding.box === 'a'));
 	assert.ok(!report.findings.some((finding) => finding.path === 'outer' && finding.box !== undefined));
+	assert.ok(!report.findings.some((finding) => finding.path === 'source' && finding.severity === 'error'));
+
+	await writeFile(source, '\\begin{tikzpicture}\\node (a) at (2,1) {A};\\end{tikzpicture}\n', 'utf8');
+	let mismatch;
+	for (const [command, prefix] of candidates) {
+		mismatch = run(command, prefix, ['--require-hash']);
+		if (mismatch.error?.code !== 'ENOENT' && mismatch.stdout.trim() !== '') break;
+	}
+	const drift = JSON.parse(mismatch.stdout);
+	assert.equal(drift.ok, false);
+	assert.ok(drift.findings.some((finding) => finding.path === 'source' && finding.severity === 'error'));
 } finally {
 	await rm(root, { recursive: true, force: true });
 }

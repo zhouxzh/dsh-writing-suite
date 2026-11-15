@@ -11,7 +11,7 @@ authors:
   - family-names: Zhou
     given-names: Xianzhong
     email: zhouxzh@gdut.edu.cn
-version: 1.1.0
+version: 1.2.0
 date-released: "2026-11-15"
 license: MIT
 repository-code: "https://github.com/zhouxzh/dsh-writing-suite"

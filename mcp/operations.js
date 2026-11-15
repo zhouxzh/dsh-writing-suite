@@ -1,6 +1,9 @@
 import { randomUUID } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { existsSync, realpathSync } from 'node:fs';
-import { isAbsolute, join } from 'node:path';
+import { homedir } from 'node:os';
+import { dirname, isAbsolute, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { PARTS, auditLearnerRecord, auditRepo, progressReport, resolveSettings, sortFindings } from '../lib/book/audit-core.js';
 import {
@@ -30,6 +33,37 @@ import { syncEvidence } from '../lib/paper/sync.js';
 
 const scopes = new Set(['all', ...PARTS.map((part) => part.key)]);
 const jobs = new Map();
+const pluginRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+
+function neuralDiagramAudit(args) {
+  const script = join(pluginRoot, 'lib', 'diagram', 'check_tikz_paths.py');
+  const candidates = [];
+  if (process.env.DSH_PYTHON) candidates.push([process.env.DSH_PYTHON, []]);
+  if (process.env.PYTHON) candidates.push([process.env.PYTHON, []]);
+  if (process.platform === 'win32') {
+    for (const path of [
+      join(homedir(), 'anaconda3', 'envs', 'sci-agent', 'python.exe'),
+      join(homedir(), 'anaconda3', 'python.exe')
+    ]) if (existsSync(path)) candidates.push([path, []]);
+    candidates.push(['py', ['-3']], ['python', []], ['python3', []]);
+  } else {
+    candidates.push(['python3', []], ['python', []]);
+  }
+  const cli = [
+    '--source', args.source,
+    ...(args.layout ? ['--layout', args.layout] : []),
+    ...(args.margin !== undefined ? ['--margin', String(args.margin)] : []),
+    ...(args.suggest === false ? ['--no-suggest'] : []),
+    ...(args.requireHash === true ? ['--require-hash'] : [])
+  ];
+  for (const [command, prefix] of candidates) {
+    const result = spawnSync(command, [...prefix, script, ...cli], { encoding: 'utf8' });
+    if (result.error?.code === 'ENOENT' || (result.status === 0 && !result.stdout.trim())) continue;
+    if (!result.stdout.trim()) throw new Error(result.stderr || `${command} produced no output`);
+    return JSON.parse(result.stdout);
+  }
+  throw new Error('Python 3 was not found');
+}
 
 export function resolveRoot(argument) {
   const selected = argument?.trim() || process.env.TUTORIAL_WRITING_ROOT?.trim();
@@ -211,7 +245,10 @@ export async function invoke(name, args = {}) {
       author: args.author,
       dryRun: args.dryRun === true
     });
-    case 'paper_audit': return auditPaper({ dir: args.workspace });
+    case 'paper_audit': return auditPaper({
+      dir: args.workspace,
+      mode: args.mode === 'submission' ? 'submission' : 'draft'
+    });
     case 'paper_build': return buildPaper({
       dir: args.workspace,
       entry: args.entry || 'main.tex',
@@ -232,6 +269,8 @@ export async function invoke(name, args = {}) {
     }
     case 'paper_review':
       return args.workspace ? reviewPaper({ dir: args.workspace }) : reviewCollection({ root: args.root });
+    case 'ascend310b_writing_neural_diagram_audit':
+      return neuralDiagramAudit(args);
     case 'paper_kit': {
       let workspace = join(args.root, args.slug);
       const sections = [];

@@ -93,9 +93,9 @@ check(
 		(finding) =>
 			finding.rule === 'prose-language' &&
 			finding.file === 'samples/case1/README.md' &&
-			finding.severity === 'warning'
+			finding.severity === 'error'
 	),
-	'English sample README must produce a code-docs language warning'
+	'English sample README must produce a code-docs language error'
 );
 
 const deck = [
