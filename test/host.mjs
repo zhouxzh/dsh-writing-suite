@@ -82,6 +82,8 @@ const expected = [
 
 	for (const [toolName, spec] of registered) {
 		assert.equal(typeof spec.execute, 'function', `${toolName}: execute`);
+		assert.equal(spec.output?.schema?.type, 'object', `${toolName}: output schema type`);
+		assert.equal(spec.output?.schema?.additionalProperties, true, `${toolName}: open output object`);
 		const rendered = spec.output.render({}, { text: `${toolName} ok` });
 		assert.ok(Array.isArray(rendered) && rendered[0]?.type === 'text', `${toolName}: render`);
 		assert.equal(rendered[0].text, `${toolName} ok`);
