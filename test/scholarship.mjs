@@ -10,8 +10,8 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { auditPaper } from '../lib/audit.js';
-import { scaffoldPaper } from '../lib/scaffold.js';
+import { auditPaper } from '../lib/paper/audit.js';
+import { scaffoldPaper } from '../lib/paper/scaffold.js';
 
 const SCHOLARSHIP_CODES = new Set([
 	'internal-id-in-title',

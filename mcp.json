@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "dsh_writing_suite": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${PLUGIN_ROOT}/mcp/server.js", "stdio"],
+      "cwd": "${PLUGIN_ROOT}",
+      "env_vars": ["TUTORIAL_WRITING_ROOT"]
+    }
+  }
+}

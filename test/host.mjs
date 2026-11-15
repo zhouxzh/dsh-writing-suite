@@ -13,9 +13,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { apply, inject, name } from '../lib/index.js';
-import { scaffoldPaper } from '../lib/scaffold.js';
+import { scaffoldPaper } from '../lib/paper/scaffold.js';
 
-assert.equal(name, 'dsh-paper-suite');
+assert.equal(name, 'dsh-writing-suite');
 assert.deepEqual(inject, ['tools']);
 
 /** Minimal host context: tools always, web server only when asked. */
@@ -29,6 +29,9 @@ function makeContext({ withWebServer = false } = {}) {
 				if (registered.has(spec.name)) throw new Error(`duplicate tool registration: ${spec.name}`);
 				registered.set(spec.name, spec);
 			}
+		},
+		get() {
+			return undefined;
 		},
 		inject(names, callback) {
 			if (withWebServer && names.includes('webServer')) {
@@ -50,6 +53,18 @@ function makeContext({ withWebServer = false } = {}) {
 }
 
 const expected = [
+	'ascend310b_writing_audit',
+	'ascend310b_writing_record_audit',
+	'ascend310b_writing_deck_render',
+	'ascend310b_writing_page_layout',
+	'ascend310b_writing_render',
+	'ascend310b_writing_push_check',
+	'ascend310b_writing_ci',
+	'ascend310b_writing_progress',
+	'ascend310b_writing_toolchain',
+	'ascend310b_writing_style',
+	'ascend310b_writing_build',
+	'ascend310b_writing_neural_diagram_audit',
 	'paper_scaffold',
 	'paper_audit',
 	'paper_build',
@@ -95,10 +110,10 @@ try {
 	const { ctx, routes } = makeContext({ withWebServer: true });
 	apply(ctx, { repoRoot: root });
 
-	assert.equal(routes.length, 1, 'exactly one report route');
-	const route = routes[0];
+	assert.equal(routes.length, 2, 'tutorial and paper report routes');
+	const route = routes.find((item) => item.path === '/paper-suite/report.json');
+	assert.ok(route !== undefined, 'paper report route missing');
 	assert.equal(route.kind, 'exact');
-	assert.equal(route.path, '/paper-suite/report.json');
 
 	const response = {
 		status: undefined,

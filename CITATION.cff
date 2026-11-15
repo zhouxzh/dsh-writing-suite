@@ -1,21 +1,21 @@
 cff-version: 1.2.0
 message: "If you use this software in academic work, please cite it as below."
-title: "dsh-paper-suite"
+title: "dsh-writing-suite"
 abstract: >-
-  An evidence-bound paper toolchain for DeepSeek Harness: a LaTeX paper
-  scaffold, a citation and claim-evidence audit, LaTeX build diagnostics with
-  structured errors, and a whitelisted remote evidence sync, bundled with the
-  paper-evidence and paper-latex-cn skills.
+  A unified writing toolchain for DeepSeek Harness that combines tutorial and
+  Markdown auditing, academic-paper scaffolding and evidence review, LaTeX and
+  site build diagnostics, deck/layout checks, and geometry-based audits of TikZ
+  neural-network diagrams.
 type: software
 authors:
   - family-names: Zhou
     given-names: Xianzhong
     email: zhouxzh@gdut.edu.cn
-version: 0.1.5
-date-released: "2026-10-23"
+version: 1.0.0
+date-released: "2026-11-15"
 license: MIT
-repository-code: "https://github.com/zhouxzh/dsh-paper-suite"
-url: "https://github.com/zhouxzh/dsh-paper-suite"
+repository-code: "https://github.com/zhouxzh/dsh-writing-suite"
+url: "https://github.com/zhouxzh/dsh-writing-suite"
 keywords:
   - deepseek-harness
   - latex

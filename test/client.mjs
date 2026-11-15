@@ -19,7 +19,7 @@ globalThis.window = {
 
 await import('../lib/client.js');
 assert.ok(loaded !== undefined, 'client did not call __ModuleLoader__.load');
-assert.equal(loaded.id, 'dsh-paper-suite');
+assert.equal(loaded.id, 'dsh-writing-suite');
 
 // Minimal React surface: components are registered, never rendered, here.
 const react = {
@@ -35,7 +35,7 @@ const module = loaded.factory((id) => {
 	throw new Error(`unexpected client dependency: ${id}`);
 });
 
-assert.equal(module.PANEL_ID, 'paper-suite');
+assert.equal(module.PANEL_ID, 'writing-suite');
 assert.deepEqual(module.inject, ['slots']);
 assert.equal(typeof module.apply, 'function');
 
@@ -57,8 +57,9 @@ const ctx = {
 
 // installStyles touches document; provide the smallest possible DOM shim.
 globalThis.document = {
+	querySelector: () => null,
 	getElementById: () => null,
-	createElement: () => ({ id: '', textContent: '' }),
+	createElement: () => ({ id: '', dataset: {}, textContent: '' }),
 	head: { appendChild: () => {} }
 };
 
@@ -67,7 +68,7 @@ module.apply(ctx);
 assert.equal(registrations.length, 2, 'expected a main panel and a sidebar entry');
 assert.deepEqual(registrations.map((item) => item.spec.name).sort(), ['main', 'sidebar.panellist']);
 assert.ok(registrations.every((item) => typeof item.component === 'function'));
-assert.equal(registrations[1].spec.id, 'paper-suite');
+assert.equal(registrations[1].spec.id, 'writing-suite');
 assert.ok(registrations[1].spec.label.length > 0);
 
 console.log(`client ok: ${registrations.length} registrations (panel + sidebar entry)`);

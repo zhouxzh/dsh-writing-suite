@@ -1,0 +1,33 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "dsh-writing-suite",
+  "version": "1.0.0",
+  "description": "Unified DSH writing suite for tutorial manuscripts, academic papers, LaTeX builds, citations, evidence, and neural-network diagram audits.",
+  "license": "MIT",
+  "keywords": [
+    "deepseek-harness",
+    "academic-writing",
+    "tutorial-writing",
+    "latex",
+    "markdown",
+    "diagrams",
+    "mcp"
+  ],
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "onboardingSkill": "./skills/ascend310b-writing/SKILL.md",
+      "interface": {
+        "displayName": "DSH 写作套件",
+        "shortDescription": "教材、论文与框图审计",
+        "longDescription": "统一审计教材 Markdown、学术论文、LaTeX 构建、引用证据、代码文档、演示课件和 TikZ 神经网络框图的连线路径。",
+        "category": "Developer Tools",
+        "capabilities": ["Read", "Write"],
+        "defaultPrompt": [
+          "使用写作套件审计当前稿件，并按报告修复可机械确认的问题。",
+          "检查论文引用、证据链、构建产物和框图几何冲突。"
+        ]
+      }
+    }
+  }
+}

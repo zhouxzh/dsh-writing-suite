@@ -1,24 +1,27 @@
 # Sources and attribution
 
-This suite ships its own skill text and its own tool code. It does **not** vendor
-upstream skill files, so no third-party text is redistributed here. The upstream
-projects below informed the structure and are the recommended companions.
+This repository is the maintained home of the merged DSH writing suite.
 
-| Project | License | Relationship |
-| --- | --- | --- |
-| [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) | MIT | Upstream of the `scientific-writing` skill already installed on this machine. `paper-evidence` is written to complement it, not to replace or fork it. |
-| [Yuan1z0825/nature-skills](https://github.com/Yuan1z0825/nature-skills) | Apache-2.0 | Upstream of `nature-polishing`. Polishing stays with that skill; this suite does not duplicate it. |
-| `dsh-plugin-ascend310b-writing` | local | Reference implementation for "one plugin + bundled skills" packaging on this machine. Its README documents that skills are plain files scanned from a skill root. |
+## Bundled modules
 
-## If you later vendor an upstream skill
+| Component | Origin | License | Relationship |
+| --- | --- | --- | --- |
+| `lib/paper`, paper skills | `zhouxzh/dsh-paper-suite`, now renamed `zhouxzh/dsh-writing-suite` | MIT | Original first-party paper tooling |
+| `lib/book`, tutorial-writing tools and skills | `zhouxzh/Ascend310`, `tools/dsh-plugin-ascend310b-writing` | MIT | Copied working-tree implementation into the unified suite |
+| `lib/diagram`, TikZ path audit skill | local `dsh-writing-neural-diagram-audit` companion | MIT | Promoted from companion plugin into the suite |
+| `scientific-writing` skill | [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) | MIT; shipped `LICENSE`/`SOURCE.md` retained | Vendored skill tree |
+| `nature-polishing` and `nature-shared` skills | [Yuan1z0825/nature-skills](https://github.com/Yuan1z0825/nature-skills) | Apache-2.0; shipped `LICENSE`/`SOURCE.md` retained | Vendored skill trees |
 
-Bundling upstream files changes the licensing obligation. Then you must:
+The skill subdirectories retain their original license and source documents. Do not remove those files when packaging.
 
-1. copy the upstream `LICENSE` into `LICENSES/<project>/LICENSE`;
-2. record the exact upstream commit here;
-3. keep the original `SKILL.md` frontmatter intact (name, license, metadata);
-4. state in `README.md` that the skill is redistributed, not authored here.
+## Merge boundary
 
-Until that is done, keep upstream skills as separate installs and let this suite
-ship only its own local skills: `paper-evidence`, `paper-latex-cn`,
-`reviewer-response-letter`, and `paper-cover-letter`.
+The merge unifies:
+
+- package installation and versioning;
+- one Host entry with stable legacy tool names;
+- one browser sidebar and panel;
+- one configuration surface (`tutorialRoot`, `paperRoot`, shared `repoRoot` fallback);
+- skill installation across the combined skill collection.
+
+Domain rules remain separated in `lib/book`, `lib/paper`, and `lib/diagram` so the modules can be tested and changed independently.

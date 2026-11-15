@@ -8,13 +8,13 @@ import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promis
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { auditPaper } from '../lib/audit.js';
-import { buildPaper, parseLatexLog } from '../lib/build.js';
-import { auditCitations, collectCiteKeys, parseBib } from '../lib/cite.js';
-import { insertTableRow } from '../lib/registry.js';
-import { reviewPaper } from '../lib/review.js';
-import { scaffoldPaper } from '../lib/scaffold.js';
-import { syncEvidence, validateHost, validateRemotePaths } from '../lib/sync.js';
+import { auditPaper } from '../lib/paper/audit.js';
+import { buildPaper, parseLatexLog } from '../lib/paper/build.js';
+import { auditCitations, collectCiteKeys, parseBib } from '../lib/paper/cite.js';
+import { insertTableRow } from '../lib/paper/registry.js';
+import { reviewPaper } from '../lib/paper/review.js';
+import { scaffoldPaper } from '../lib/paper/scaffold.js';
+import { syncEvidence, validateHost, validateRemotePaths } from '../lib/paper/sync.js';
 
 const failures = [];
 /**

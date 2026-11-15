@@ -31,10 +31,14 @@ async function hash(path) {
 	}
 }
 
-/** Skill directories: those carrying a SKILL.md. */
+/** Support directories referenced by sibling skills but carrying no SKILL.md. */
+const SUPPORT_DIRECTORIES = new Set(['nature-shared']);
+
+/** Skill directories, plus explicitly supported shared resource directories. */
 export async function listSkills(root = skillsRoot) {
 	const entries = await readdir(root, { withFileTypes: true });
 	const skills = [];
+	const support = [];
 	const skipped = [];
 	for (const entry of entries) {
 		if (!entry.isDirectory()) continue;
@@ -43,11 +47,37 @@ export async function listSkills(root = skillsRoot) {
 			await stat(join(dir, 'SKILL.md'));
 			skills.push({ name: entry.name, dir });
 		} catch {
-			skipped.push(entry.name);
+			if (SUPPORT_DIRECTORIES.has(entry.name)) support.push({ name: entry.name, dir });
+			else skipped.push(entry.name);
 		}
 	}
 	skills.sort((a, b) => a.name.localeCompare(b.name));
-	return { skills, skipped };
+	support.sort((a, b) => a.name.localeCompare(b.name));
+	return { skills, support, skipped };
+}
+
+/** Walk all regular files below one directory. */
+async function walkFiles(dir, prefix = '') {
+	const entries = await readdir(join(dir, prefix), { withFileTypes: true });
+	const files = [];
+	for (const entry of entries) {
+		const rel = prefix === '' ? entry.name : `${prefix}/${entry.name}`;
+		if (entry.isDirectory()) files.push(...await walkFiles(dir, rel));
+		else if (entry.isFile()) files.push(rel);
+	}
+	return files;
+}
+
+/** Compare one complete skill/support tree without writing. */
+async function treeState(sourceDir, targetDir) {
+	const files = await walkFiles(sourceDir);
+	for (const rel of files) {
+		const sourceHash = await hash(join(sourceDir, rel));
+		const destHash = await hash(join(targetDir, rel));
+		if (destHash === undefined) return 'missing';
+		if (destHash !== sourceHash) return 'stale';
+	}
+	return 'current';
 }
 
 /**
@@ -56,26 +86,25 @@ export async function listSkills(root = skillsRoot) {
  */
 export async function installSkills({ target, check = false } = {}) {
 	const root = target === undefined ? join(homedir(), '.dsh', 'skills') : resolve(target);
-	const { skills, skipped } = await listSkills();
+	const { skills, support, skipped } = await listSkills();
 	const results = [];
 
-	for (const skill of skills) {
-		const dest = join(root, skill.name);
-		const sourceHash = await hash(join(skill.dir, 'SKILL.md'));
-		const destHash = await hash(join(dest, 'SKILL.md'));
+	for (const item of [...skills, ...support]) {
+		const dest = join(root, item.name);
+		const state = await treeState(item.dir, dest);
 		if (check) {
-			results.push({
-				name: skill.name,
-				state: destHash === undefined ? 'missing' : destHash === sourceHash ? 'current' : 'stale'
-			});
+			results.push({ name: item.name, state });
 			continue;
 		}
 		await mkdir(root, { recursive: true });
-		await cp(skill.dir, dest, { recursive: true, force: true });
-		results.push({ name: skill.name, state: destHash === undefined ? 'installed' : 'updated' });
+		await cp(item.dir, dest, { recursive: true, force: true });
+		results.push({
+			name: item.name,
+			state: state === 'current' ? 'current' : state === 'missing' ? 'installed' : 'updated'
+		});
 	}
 
-	return { root, results, skipped };
+	return { root, results, support, skipped };
 }
 
 // Windows exposes argv[1] as a native path, so compare canonical file URLs

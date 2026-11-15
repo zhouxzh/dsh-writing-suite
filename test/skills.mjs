@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 import { installSkills, listSkills } from '../scripts/install-skill.mjs';
 
-const { skills, skipped } = await listSkills();
+const { skills, support, skipped } = await listSkills();
 assert.ok(skills.length >= 2, `expected at least 2 skills, got ${skills.length}`);
 
 for (const skill of skills) {
@@ -39,7 +39,7 @@ for (const skill of skills) {
 const root = await mkdtemp(join(tmpdir(), 'paper-suite-skills-'));
 try {
 	const first = await installSkills({ target: root });
-	assert.equal(first.results.length, skills.length);
+	assert.equal(first.results.length, skills.length + support.length);
 	assert.ok(first.results.every((item) => item.state === 'installed'));
 
 	const second = await installSkills({ target: root, check: true });
@@ -60,5 +60,5 @@ try {
 }
 
 console.log(
-	`skills ok: ${skills.length} skill(s) valid${skipped.length > 0 ? `, ${skipped.length} support dir(s) skipped` : ''}`
+	`skills ok: ${skills.length} skill(s) valid, ${support.length} support dir(s) installed${skipped.length > 0 ? `, ${skipped.length} unrelated dir(s) skipped` : ''}`
 );
