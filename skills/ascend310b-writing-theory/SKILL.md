@@ -1,6 +1,6 @@
 ---
 name: ascend310b-writing-theory
-description: Ascend310 教材理论章节写作。用于新增、改写、重命名第1章至第10章及附录理论内容，维护 src/book、sidebar、README 、冻结名、章节结构和理论教程的 Markdown/LaTeX/PDF 证据；不用于案例运行手册、代码 docs 或课件排版。
+description: Ascend310 教材理论章节写作。用于新增、改写、重命名第1章至第10章及附录理论内容，维护 src/book、分区 README、冻结名、章节结构和理论教程的 Markdown/LaTeX/PDF 证据；sidebar 由 ascend310b-writing-vuepress 维护；不用于案例运行手册、代码 docs 或课件排版。
 ---
 
 # 理论章节写作
